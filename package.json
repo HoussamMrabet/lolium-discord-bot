@@ -1,0 +1,55 @@
+{
+  "name": "discord-lol-bot",
+  "version": "0.1.0",
+  "description": "Production-grade League of Legends tracking Discord bot (Riot API, MongoDB, Redis/BullMQ).",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node entrypoints/mono.js",
+    "start:bot": "node entrypoints/bot.js",
+    "start:scheduler": "node entrypoints/scheduler.js",
+    "start:worker": "node entrypoints/worker.js",
+    "start:api": "node entrypoints/api.js",
+    "deploy:commands": "node src/bot/deploy-commands.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
+    "config:check": "node scripts/check-config.js"
+  },
+  "dependencies": {
+    "@discordjs/rest": "^2.4.0",
+    "@napi-rs/canvas": "^0.1.65",
+    "axios": "^1.7.7",
+    "bullmq": "^5.20.0",
+    "connect-redis": "^7.1.1",
+    "discord-api-types": "^0.37.100",
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "express-rate-limit": "^7.4.1",
+    "express-session": "^1.18.1",
+    "helmet": "^8.0.0",
+    "ioredis": "^5.4.1",
+    "mongoose": "^8.8.0",
+    "pino": "^9.5.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.15.0",
+    "eslint": "^9.15.0",
+    "eslint-config-prettier": "^9.1.0",
+    "globals": "^15.12.0",
+    "jest": "^29.7.0",
+    "mongodb-memory-server": "^10.1.2",
+    "nock": "^13.5.5",
+    "pino-pretty": "^13.0.0",
+    "prettier": "^3.3.3"
+  }
+}
