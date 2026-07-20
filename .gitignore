@@ -25,3 +25,4 @@ Thumbs.db
 
 # mongodb-memory-server binaries
 .mongodb-binaries/
+skills/
