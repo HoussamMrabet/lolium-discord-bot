@@ -33,7 +33,7 @@ function build(purpose, overrides = {}) {
   return conn;
 }
 
-/** Shared connection for BullMQ producers. Workers should call `duplicate()`. */
+/** Shared connection for BullMQ producers (Queue instances). */
 export function getBullConnection() {
   if (!connections.has('bull')) {
     connections.set(
@@ -42,6 +42,18 @@ export function getBullConnection() {
     );
   }
   return connections.get('bull');
+}
+
+/**
+ * A FRESH BullMQ-compatible connection (not cached). Each BullMQ Worker needs
+ * its own connection because it issues blocking commands; sharing one across
+ * workers would serialize them.
+ */
+export function createBullConnection() {
+  return build('bull-worker', {
+    maxRetriesPerRequest: null,
+    enableReadyCheck: false,
+  });
 }
 
 /** Shared general-purpose connection (cache, limiter, locks, leaderboards). */
