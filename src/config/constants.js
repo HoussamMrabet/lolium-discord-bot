@@ -160,7 +160,9 @@ export const CACHE_TTL = Object.freeze({
   LEAGUE: 90, // tier/div/lp (only to dedupe bursts; DB is source of truth)
   MATCH_IDS: 45, // highest-frequency poll; short cache kills duplicates
   MATCH_DETAIL: 7 * 24 * 60 * 60, // hot cache; Mongo is the permanent store
+  SPECTATOR: 20, // live-game state; very short
   STATIC_DATA: 24 * 60 * 60, // Data Dragon version-pinned assets
+  NEGATIVE: 10 * 60, // cache "not found" to avoid re-fetching missing resources
 });
 
 /** Redis key builders for cached Riot responses. */
