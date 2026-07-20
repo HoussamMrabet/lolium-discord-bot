@@ -25,3 +25,4 @@ export function startWorker(name, processor, { concurrency = 5 } = {}) {
 
 export { createRiotFetchProcessor } from './riotFetch.js';
 export { createMatchProcessProcessor } from './matchProcess.js';
+export { createNotifyDispatchProcessor } from './notifyDispatch.js';

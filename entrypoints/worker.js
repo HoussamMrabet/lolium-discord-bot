@@ -1,3 +1,4 @@
+import { REST } from 'discord.js';
 import { env } from '../src/config/env.js';
 import { QUEUE_NAMES } from '../src/config/constants.js';
 import { connectMongo, disconnectMongo } from '../src/database/connection.js';
@@ -7,18 +8,20 @@ import { registerShutdown } from '../src/core/shutdown.js';
 import { repositories } from '../src/database/repositories/index.js';
 import { createRiotService } from '../src/riot/index.js';
 import { createServices } from '../src/services/index.js';
+import { createNotificationService } from '../src/services/notification.service.js';
 import { createPollStore } from '../src/jobs/pollStore.js';
-import { matchProcessQueue, closeQueues } from '../src/queues/index.js';
+import { matchProcessQueue, notifyQueue, closeQueues } from '../src/queues/index.js';
 import {
   startWorker,
   createRiotFetchProcessor,
   createMatchProcessProcessor,
+  createNotifyDispatchProcessor,
 } from '../src/workers/index.js';
 
 /**
  * Worker process. `WORKER_TYPE` selects which queue to consume
- * (riot-fetch | match-process | all). Horizontally scalable — run as many
- * replicas as queue depth demands.
+ * (riot-fetch | match-process | notify-dispatch | all). Horizontally scalable —
+ * run as many replicas as queue depth demands.
  */
 const log = createLogger('worker');
 
@@ -27,6 +30,11 @@ async function main() {
 
   const riot = createRiotService();
   const services = createServices({ riot, repositories, logger: log });
+  const notifications = createNotificationService({
+    repositories,
+    notifyQueue,
+    logger: log,
+  });
   const pollStore = createPollStore(getRedis());
   const type = env.WORKER_TYPE || 'all';
   const concurrency = env.WORKER_CONCURRENCY;
@@ -52,7 +60,18 @@ async function main() {
     workers.push(
       startWorker(
         QUEUE_NAMES.MATCH_PROCESS,
-        createMatchProcessProcessor({ services, logger: log }),
+        createMatchProcessProcessor({ services, notifications, logger: log }),
+        { concurrency },
+      ),
+    );
+  }
+
+  if (type === QUEUE_NAMES.NOTIFY_DISPATCH || type === 'all') {
+    const rest = new REST({ version: '10' }).setToken(env.DISCORD_TOKEN);
+    workers.push(
+      startWorker(
+        QUEUE_NAMES.NOTIFY_DISPATCH,
+        createNotifyDispatchProcessor({ repositories, rest, logger: log }),
         { concurrency },
       ),
     );

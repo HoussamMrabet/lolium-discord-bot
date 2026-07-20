@@ -55,6 +55,14 @@ export class NotificationRepository extends BaseRepository {
     );
   }
 
+  /** Transient failure: bump the attempt counter but keep it pending for retry. */
+  recordFailure(dedupeKey, error) {
+    return this.updateOne(
+      { dedupeKey },
+      { $inc: { attempts: 1 }, $set: { lastError: String(error).slice(0, 500) } },
+    );
+  }
+
   findPending(limit = 100) {
     return this.model
       .find({ status: 'pending', scheduledFor: { $lte: new Date() } })

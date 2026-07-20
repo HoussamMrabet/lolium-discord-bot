@@ -1,11 +1,12 @@
 /**
  * match-process worker: persist a match and the tracked summoner's derived
- * record, and update LP/rank/streak (via the match-processing service).
+ * record (LP/rank/streak via the match-processing service), then hand the result
+ * to the notification service to fan out per-guild alerts.
  *
- * Notification fan-out (match alerts, promotions, streak milestones) is added in
- * Phase 7b — this worker will then hand `result` to the notification service.
+ * Notifications only fire for freshly-processed games (`!alreadyProcessed`), so
+ * reprocessing never re-alerts; the outbox dedupeKey is the final safety net.
  */
-export function createMatchProcessProcessor({ services, logger }) {
+export function createMatchProcessProcessor({ services, notifications, logger }) {
   return async function process(job) {
     const { matchId, platform, summonerId, puuid } = job.data;
     const result = await services.matchProcessing.processMatchForSummoner({
@@ -16,6 +17,11 @@ export function createMatchProcessProcessor({ services, logger }) {
     });
     if (!result) return { skipped: true };
 
+    let enqueued = 0;
+    if (notifications && !result.alreadyProcessed) {
+      ({ enqueued } = await notifications.fanOutMatch({ puuid, summonerId, result }));
+    }
+
     logger.debug(
       {
         matchId,
@@ -23,9 +29,10 @@ export function createMatchProcessProcessor({ services, logger }) {
         bucket: result.performanceBucket,
         lpDelta: result.rankEvent?.lpDelta ?? null,
         promotion: result.rankEvent?.promotion ?? false,
+        enqueued,
       },
       'processed match',
     );
-    return { processed: true, alreadyProcessed: result.alreadyProcessed };
+    return { processed: true, alreadyProcessed: result.alreadyProcessed, enqueued };
   };
 }
