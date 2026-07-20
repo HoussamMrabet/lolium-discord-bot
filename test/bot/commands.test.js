@@ -15,8 +15,21 @@ describe('slash command modules', () => {
   });
 
   it('loads every command module', () => {
-    expect(commands.size).toBeGreaterThanOrEqual(7);
-    for (const name of ['ping', 'help', 'setup', 'channel', 'settings', 'unlink', 'admin']) {
+    expect(commands.size).toBeGreaterThanOrEqual(12);
+    for (const name of [
+      'ping',
+      'help',
+      'setup',
+      'channel',
+      'settings',
+      'unlink',
+      'admin',
+      'link',
+      'profile',
+      'rank',
+      'stats',
+      'history',
+    ]) {
       expect(commands.has(name)).toBe(true);
     }
   });
