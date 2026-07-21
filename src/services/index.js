@@ -4,6 +4,7 @@ import { createStatsService } from './stats.service.js';
 import { createMatchProcessingService } from './matchProcessing.service.js';
 import { createLeaderboardService } from './leaderboard.service.js';
 import { createRoleSyncService } from './roleSync.service.js';
+import { createBettingService } from './betting.service.js';
 import * as performance from './performance.service.js';
 import * as streak from './streak.service.js';
 
@@ -17,6 +18,7 @@ export function createServices({ riot, repositories, logger }) {
   const stats = createStatsService({ repositories });
   const leaderboard = createLeaderboardService({ repositories });
   const roleSync = createRoleSyncService({ repositories });
+  const betting = createBettingService({ repositories, logger });
   const matchProcessing = createMatchProcessingService({
     riot,
     repositories,
@@ -25,7 +27,7 @@ export function createServices({ riot, repositories, logger }) {
     streak,
     logger,
   });
-  return { rank, linking, stats, leaderboard, roleSync, matchProcessing };
+  return { rank, linking, stats, leaderboard, roleSync, betting, matchProcessing };
 }
 
 export default createServices;

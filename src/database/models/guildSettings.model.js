@@ -58,6 +58,9 @@ const guildSettingsSchema = new Schema(
       type: [String],
       default: () => Object.values(LEADERBOARD_CATEGORIES),
     },
+    // Current betting season; wallets/bets are keyed by this so a reset simply
+    // starts a fresh season while archiving the old one.
+    bettingSeasonId: { type: String, default: 'S1' },
     locale: { type: String, default: 'en-US' },
   },
   { timestamps: true, versionKey: false, minimize: false },

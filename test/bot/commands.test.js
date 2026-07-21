@@ -15,7 +15,7 @@ describe('slash command modules', () => {
   });
 
   it('loads every command module', () => {
-    expect(commands.size).toBeGreaterThanOrEqual(13);
+    expect(commands.size).toBeGreaterThanOrEqual(14);
     for (const name of [
       'ping',
       'help',
@@ -30,6 +30,7 @@ describe('slash command modules', () => {
       'stats',
       'history',
       'leaderboard',
+      'betting',
     ]) {
       expect(commands.has(name)).toBe(true);
     }

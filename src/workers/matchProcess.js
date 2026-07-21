@@ -33,6 +33,15 @@ export function createMatchProcessProcessor({ services, notifications, roleTrigg
       await roleTrigger.onRankChange({ puuid });
     }
 
+    // Resolve any open bets on this game for this player.
+    if (!result.alreadyProcessed && services.betting) {
+      await services.betting.resolveForMatch({
+        match: result.match,
+        subjectSummonerId: summonerId,
+        subjectPuuid: puuid,
+      });
+    }
+
     logger.debug(
       {
         matchId,

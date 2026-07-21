@@ -47,6 +47,10 @@ export class GuildSettingsRepository extends BaseRepository {
   findRoleSyncEnabled() {
     return this.find({ 'features.roleSync': true });
   }
+
+  setBettingSeason(guildId, seasonId) {
+    return this.upsert({ guildId }, { $set: { bettingSeasonId: seasonId } });
+  }
 }
 
 export default GuildSettingsRepository;
