@@ -26,3 +26,5 @@ export function startWorker(name, processor, { concurrency = 5 } = {}) {
 export { createRiotFetchProcessor } from './riotFetch.js';
 export { createMatchProcessProcessor } from './matchProcess.js';
 export { createNotifyDispatchProcessor } from './notifyDispatch.js';
+export { createLeaderboardComputeProcessor } from './leaderboardCompute.js';
+export { createRoleSyncProcessor } from './roleSync.js';

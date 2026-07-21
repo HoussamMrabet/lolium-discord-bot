@@ -37,6 +37,16 @@ export class GuildSettingsRepository extends BaseRepository {
   patch(guildId, set) {
     return this.upsert({ guildId }, { $set: set });
   }
+
+  /** Guilds that have a given channel configured (e.g. 'leaderboard'). */
+  findWithChannel(key) {
+    return this.find({ [`channels.${key}`]: { $ne: null } });
+  }
+
+  /** Guilds with automatic rank-role syncing enabled. */
+  findRoleSyncEnabled() {
+    return this.find({ 'features.roleSync': true });
+  }
 }
 
 export default GuildSettingsRepository;

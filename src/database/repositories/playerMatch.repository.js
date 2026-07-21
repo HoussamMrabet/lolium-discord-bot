@@ -68,6 +68,34 @@ export class PlayerMatchRepository extends BaseRepository {
       .exec();
   }
 
+  /**
+   * One aggregation that feeds most leaderboard categories: per summoner, over a
+   * time window, the games/wins/damage/kda/vision/pentas.
+   */
+  leaderboardAggregate(summonerIds, since) {
+    return this.model
+      .aggregate([
+        {
+          $match: {
+            summonerId: { $in: summonerIds.map(toObjectId) },
+            gameEndAt: { $gte: since },
+          },
+        },
+        {
+          $group: {
+            _id: '$summonerId',
+            games: { $sum: 1 },
+            wins: { $sum: { $cond: ['$win', 1, 0] } },
+            totalDamage: { $sum: '$damage' },
+            avgKda: { $avg: '$kda' },
+            totalVision: { $sum: '$visionScore' },
+            pentaKills: { $sum: '$pentaKills' },
+          },
+        },
+      ])
+      .exec();
+  }
+
   /** Role/position distribution for the stats embed. */
   roleDistribution(summonerId) {
     return this.model

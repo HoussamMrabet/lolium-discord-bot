@@ -5,6 +5,10 @@ export class SummonerRepository extends BaseRepository {
     return this.findOne({ puuid });
   }
 
+  findByPuuids(puuids) {
+    return this.find({ puuid: { $in: puuids } });
+  }
+
   /** Create or refresh the identity fields of a globally-deduped summoner. */
   upsertIdentity({
     puuid,

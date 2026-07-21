@@ -10,18 +10,26 @@ import { createRiotService } from '../src/riot/index.js';
 import { createServices } from '../src/services/index.js';
 import { createNotificationService } from '../src/services/notification.service.js';
 import { createPollStore } from '../src/jobs/pollStore.js';
-import { matchProcessQueue, notifyQueue, closeQueues } from '../src/queues/index.js';
+import { createRoleTrigger } from '../src/jobs/roleTrigger.js';
+import {
+  matchProcessQueue,
+  notifyQueue,
+  roleSyncQueue,
+  closeQueues,
+} from '../src/queues/index.js';
 import {
   startWorker,
   createRiotFetchProcessor,
   createMatchProcessProcessor,
   createNotifyDispatchProcessor,
+  createLeaderboardComputeProcessor,
+  createRoleSyncProcessor,
 } from '../src/workers/index.js';
 
 /**
- * Worker process. `WORKER_TYPE` selects which queue to consume
- * (riot-fetch | match-process | notify-dispatch | all). Horizontally scalable —
- * run as many replicas as queue depth demands.
+ * Worker process. `WORKER_TYPE` selects which queue(s) to consume:
+ * riot-fetch | match-process | notify-dispatch | leaderboard-compute |
+ * role-sync | all. Horizontally scalable.
  */
 const log = createLogger('worker');
 
@@ -30,25 +38,54 @@ async function main() {
 
   const riot = createRiotService();
   const services = createServices({ riot, repositories, logger: log });
-  const notifications = createNotificationService({
-    repositories,
-    notifyQueue,
-    logger: log,
-  });
+  const notifications = createNotificationService({ repositories, notifyQueue, logger: log });
+  const roleTrigger = createRoleTrigger({ repositories, roleSyncQueue });
   const pollStore = createPollStore(getRedis());
+  const rest = new REST({ version: '10' }).setToken(env.DISCORD_TOKEN);
+
   const type = env.WORKER_TYPE || 'all';
   const concurrency = env.WORKER_CONCURRENCY;
+  const all = type === 'all';
   const workers = [];
 
-  if (type === QUEUE_NAMES.RIOT_FETCH || type === 'all') {
+  if (all || type === QUEUE_NAMES.RIOT_FETCH) {
     workers.push(
       startWorker(
         QUEUE_NAMES.RIOT_FETCH,
-        createRiotFetchProcessor({
+        createRiotFetchProcessor({ repositories, riot, matchProcessQueue, pollStore, logger: log }),
+        { concurrency },
+      ),
+    );
+  }
+
+  if (all || type === QUEUE_NAMES.MATCH_PROCESS) {
+    workers.push(
+      startWorker(
+        QUEUE_NAMES.MATCH_PROCESS,
+        createMatchProcessProcessor({ services, notifications, roleTrigger, logger: log }),
+        { concurrency },
+      ),
+    );
+  }
+
+  if (all || type === QUEUE_NAMES.NOTIFY_DISPATCH) {
+    workers.push(
+      startWorker(
+        QUEUE_NAMES.NOTIFY_DISPATCH,
+        createNotifyDispatchProcessor({ repositories, rest, logger: log }),
+        { concurrency },
+      ),
+    );
+  }
+
+  if (all || type === QUEUE_NAMES.LEADERBOARD_COMPUTE) {
+    workers.push(
+      startWorker(
+        QUEUE_NAMES.LEADERBOARD_COMPUTE,
+        createLeaderboardComputeProcessor({
           repositories,
-          riot,
-          matchProcessQueue,
-          pollStore,
+          leaderboard: services.leaderboard,
+          rest,
           logger: log,
         }),
         { concurrency },
@@ -56,22 +93,16 @@ async function main() {
     );
   }
 
-  if (type === QUEUE_NAMES.MATCH_PROCESS || type === 'all') {
+  if (all || type === QUEUE_NAMES.ROLE_SYNC) {
     workers.push(
       startWorker(
-        QUEUE_NAMES.MATCH_PROCESS,
-        createMatchProcessProcessor({ services, notifications, logger: log }),
-        { concurrency },
-      ),
-    );
-  }
-
-  if (type === QUEUE_NAMES.NOTIFY_DISPATCH || type === 'all') {
-    const rest = new REST({ version: '10' }).setToken(env.DISCORD_TOKEN);
-    workers.push(
-      startWorker(
-        QUEUE_NAMES.NOTIFY_DISPATCH,
-        createNotifyDispatchProcessor({ repositories, rest, logger: log }),
+        QUEUE_NAMES.ROLE_SYNC,
+        createRoleSyncProcessor({
+          repositories,
+          roleSync: services.roleSync,
+          rest,
+          logger: log,
+        }),
         { concurrency },
       ),
     );

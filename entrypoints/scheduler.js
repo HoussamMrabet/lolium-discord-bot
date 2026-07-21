@@ -6,32 +6,48 @@ import { registerShutdown } from '../src/core/shutdown.js';
 import { repositories } from '../src/database/repositories/index.js';
 import { createPollStore } from '../src/jobs/pollStore.js';
 import { createPollScheduler } from '../src/jobs/pollScheduler.js';
-import { riotFetchQueue, closeQueues } from '../src/queues/index.js';
+import { createLeaderboardScheduler } from '../src/jobs/leaderboardScheduler.js';
+import { riotFetchQueue, leaderboardQueue, closeQueues } from '../src/queues/index.js';
 
 /**
- * Scheduler process (singleton). Ticks the adaptive poll loop on an interval,
- * enqueuing riot-fetch jobs for due summoners. Repeatable jobs (recaps, role
- * reconciliation, betting resolution, season resets) are added in later phases.
+ * Scheduler process (singleton). Ticks the adaptive poll loop, and on a slower
+ * interval enqueues leaderboard refreshes. Further repeatable jobs (recaps,
+ * betting resolution, season resets) are added in later phases.
  */
+const LEADERBOARD_INTERVAL_MS = 15 * 60 * 1000;
+
 const log = createLogger('scheduler');
 
 async function main() {
   await connectMongo();
 
   const pollStore = createPollStore(getRedis());
-  const scheduler = createPollScheduler({
+  const pollScheduler = createPollScheduler({
     pollStore,
     repositories,
     riotFetchQueue,
     logger: log,
   });
+  const leaderboardScheduler = createLeaderboardScheduler({
+    repositories,
+    leaderboardQueue,
+    logger: log,
+  });
 
-  log.info({ intervalMs: env.POLL_TICK_INTERVAL_MS }, 'poll scheduler starting');
-  const timer = setInterval(() => scheduler.tick(), env.POLL_TICK_INTERVAL_MS);
-  await scheduler.tick(); // run one immediately on boot
+  log.info({ intervalMs: env.POLL_TICK_INTERVAL_MS }, 'scheduler starting');
+  const pollTimer = setInterval(() => pollScheduler.tick(), env.POLL_TICK_INTERVAL_MS);
+  const lbTimer = setInterval(
+    () =>
+      leaderboardScheduler
+        .enqueueDueGuilds()
+        .catch((err) => log.error({ err }, 'leaderboard tick failed')),
+    LEADERBOARD_INTERVAL_MS,
+  );
+  await pollScheduler.tick(); // run one immediately on boot
 
   registerShutdown([
-    () => clearInterval(timer),
+    () => clearInterval(pollTimer),
+    () => clearInterval(lbTimer),
     closeQueues,
     closeRedis,
     disconnectMongo,
