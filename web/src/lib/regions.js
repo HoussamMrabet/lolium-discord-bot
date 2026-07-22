@@ -1,0 +1,18 @@
+export const REGIONS = [
+  { value: 'euw1', label: 'EU West' },
+  { value: 'na1', label: 'North America' },
+  { value: 'kr', label: 'Korea' },
+  { value: 'eun1', label: 'EU Nordic & East' },
+  { value: 'br1', label: 'Brazil' },
+  { value: 'jp1', label: 'Japan' },
+  { value: 'la1', label: 'LAN' },
+  { value: 'la2', label: 'LAS' },
+  { value: 'oc1', label: 'Oceania' },
+  { value: 'tr1', label: 'Turkey' },
+  { value: 'ru', label: 'Russia' },
+  { value: 'ph2', label: 'Philippines' },
+  { value: 'sg2', label: 'Singapore' },
+  { value: 'th2', label: 'Thailand' },
+  { value: 'tw2', label: 'Taiwan' },
+  { value: 'vn2', label: 'Vietnam' },
+];

@@ -100,7 +100,7 @@ export function createApp({ repositories, services, redis, riot }) {
 
   // Public website endpoints (no auth): summoner lookup + champion browser.
   const staticData = createStaticDataService({ redis });
-  const lookup = createLookupService({ riot, rank: services.rank, redis });
+  const lookup = createLookupService({ riot, rank: services.rank, staticData, redis });
   const publicController = createPublicController({ lookup, staticData });
 
   app.use('/api/v1', publicRouter({ controller: publicController }));

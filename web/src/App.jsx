@@ -5,6 +5,7 @@ import Footer from './components/Footer.jsx';
 import Landing from './pages/Landing.jsx';
 import Search from './pages/Search.jsx';
 import Champions from './pages/Champions.jsx';
+import ChampionDetail from './pages/ChampionDetail.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import NotFound from './pages/NotFound.jsx';
 
@@ -24,6 +25,7 @@ export default function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/search" element={<Search />} />
           <Route path="/champions" element={<Champions />} />
+          <Route path="/champions/:id" element={<ChampionDetail />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

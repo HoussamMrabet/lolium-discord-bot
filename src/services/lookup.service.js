@@ -14,7 +14,7 @@ const RECENT_COUNT = 6; // recent games to fetch (each is one Riot call, cached)
  * details reuse the client's permanent match cache, and the route is tightly
  * rate-limited. Nothing is persisted to Mongo.
  */
-export function createLookupService({ riot, rank, redis, logger = createLogger('lookup') }) {
+export function createLookupService({ riot, rank, staticData, redis, logger = createLogger('lookup') }) {
   async function getProfile({ gameName, tagLine, platform }) {
     const p = normalizePlatform(platform);
     if (!p) throw new ValidationError(`Unsupported region: ${platform}`);
@@ -82,11 +82,20 @@ export function createLookupService({ riot, rank, redis, logger = createLogger('
       }
     }
 
+    // Data Dragon version so the UI can build icon URLs (best-effort).
+    let version = null;
+    try {
+      version = await staticData.getVersion();
+    } catch (err) {
+      logger.warn({ err }, 'ddragon version fetch failed during lookup');
+    }
+
     const profile = {
       riotId: { gameName: account.gameName ?? name, tagLine: account.tagLine ?? tag },
       platform: p,
       summonerLevel: summonerDto.summonerLevel ?? 0,
       profileIconId: summonerDto.profileIconId ?? 0,
+      version,
       ranked,
       recentMatches,
     };

@@ -34,11 +34,12 @@ function makeRiot() {
 }
 
 const rank = new RankService();
+const staticData = { getVersion: () => '15.14.1' };
 
 describe('lookup.getProfile', () => {
   it('assembles a public profile with ranked + recent matches', async () => {
     const riot = makeRiot();
-    const service = createLookupService({ riot, rank, redis: memRedis() });
+    const service = createLookupService({ riot, rank, staticData, redis: memRedis() });
 
     const profile = await service.getProfile({ gameName: 'Faker', tagLine: 'KR1', platform: 'na1' });
 
@@ -54,7 +55,7 @@ describe('lookup.getProfile', () => {
 
   it('serves a repeat lookup from cache (no extra Riot calls)', async () => {
     const riot = makeRiot();
-    const service = createLookupService({ riot, rank, redis: memRedis() });
+    const service = createLookupService({ riot, rank, staticData, redis: memRedis() });
 
     await service.getProfile({ gameName: 'Faker', tagLine: 'KR1', platform: 'na1' });
     await service.getProfile({ gameName: 'Faker', tagLine: 'KR1', platform: 'na1' });
@@ -70,14 +71,14 @@ describe('lookup.getProfile', () => {
       err.code = 'RIOT_NOT_FOUND';
       throw err;
     });
-    const service = createLookupService({ riot, rank, redis: memRedis() });
+    const service = createLookupService({ riot, rank, staticData, redis: memRedis() });
     await expect(
       service.getProfile({ gameName: 'Ghost', tagLine: '000', platform: 'na1' }),
     ).rejects.toMatchObject({ code: 'NOT_FOUND' });
   });
 
   it('rejects an invalid region', async () => {
-    const service = createLookupService({ riot: makeRiot(), rank, redis: memRedis() });
+    const service = createLookupService({ riot: makeRiot(), rank, staticData, redis: memRedis() });
     await expect(
       service.getProfile({ gameName: 'Faker', tagLine: 'KR1', platform: 'mars' }),
     ).rejects.toMatchObject({ code: 'VALIDATION_ERROR' });

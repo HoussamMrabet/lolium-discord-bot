@@ -1,0 +1,326 @@
+/* ============================ Shared page bits ============================ */
+.page-title {
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  margin: 12px 0 30px;
+}
+.subhead {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  margin: 32px 0 16px;
+  color: var(--gold-bright);
+}
+.notice {
+  border: 1px solid var(--line);
+  background: rgba(18, 26, 39, 0.5);
+  padding: 20px 22px;
+  color: var(--text-dim);
+}
+.notice.error {
+  border-color: rgba(255, 92, 108, 0.4);
+  color: #ffb3ba;
+  background: rgba(255, 92, 108, 0.08);
+}
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-dim);
+  padding: 24px 0;
+}
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--line-strong);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================ Inputs ============================ */
+.input,
+.select {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--text);
+  background: var(--bg-2);
+  border: 1px solid var(--line-strong);
+  padding: 13px 16px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(200, 170, 110, 0.15);
+}
+.input.full {
+  width: 100%;
+  margin-bottom: 26px;
+}
+.search-form {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 34px;
+  flex-wrap: wrap;
+}
+.search-form .input {
+  flex: 1 1 320px;
+}
+
+/* ============================ Summoner profile ============================ */
+.profile-head {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 22px 24px;
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1px solid var(--line);
+}
+.profile-icon {
+  border-radius: 10px;
+  border: 2px solid var(--gold-deep);
+}
+.profile-name {
+  font-size: 1.7rem;
+}
+.profile-name .tag {
+  color: var(--muted);
+  font-weight: 500;
+  margin-left: 4px;
+}
+.profile-meta {
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+.rank-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 18px;
+}
+.rank-card {
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--muted);
+  background: rgba(18, 26, 39, 0.55);
+  padding: 20px 22px;
+}
+.rank-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.rank-tier {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  margin: 8px 0 6px;
+}
+.rank-wl {
+  color: var(--text-dim);
+  font-size: 0.92rem;
+}
+
+/* Match list */
+.match-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.match-row {
+  display: grid;
+  grid-template-columns: 44px 1.4fr 1fr 0.7fr 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--muted);
+  background: rgba(18, 26, 39, 0.4);
+}
+.match-row.win {
+  border-left-color: var(--win);
+}
+.match-row.loss {
+  border-left-color: var(--loss);
+}
+.champ-sq {
+  border-radius: 8px;
+  border: 1px solid var(--line-strong);
+}
+.mr-champ b {
+  display: block;
+  font-family: var(--font-display);
+}
+.mr-champ span,
+.mr-stat span {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.mr-stat b {
+  font-family: var(--font-display);
+}
+.mr-res {
+  text-align: right;
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+.mr-res.win {
+  color: var(--win);
+}
+.mr-res.loss {
+  color: var(--loss);
+}
+.mr-res span {
+  display: block;
+  font-family: var(--font-body);
+  font-weight: 400;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+/* ============================ Champion grid ============================ */
+.champ-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 14px;
+}
+.champ-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 18px 12px;
+  border: 1px solid var(--line);
+  background: rgba(18, 26, 39, 0.45);
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.champ-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--gold-deep);
+  box-shadow: var(--shadow);
+}
+.champ-card img {
+  border-radius: 10px;
+  border: 1px solid var(--line-strong);
+}
+.champ-card b {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+}
+.champ-card span {
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+/* ============================ Champion detail ============================ */
+.champ-hero {
+  background-size: cover;
+  background-position: center 22%;
+  padding: clamp(100px, 20vh, 220px) 0 34px;
+  border-bottom: 1px solid var(--line);
+}
+.back-link {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+.back-link:hover {
+  color: var(--gold);
+}
+.champ-hero h1 {
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  margin-top: 14px;
+}
+.champ-title {
+  color: var(--gold);
+  font-family: var(--font-display);
+  text-transform: capitalize;
+  margin-top: 4px;
+}
+.tag-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+.tag-chip {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  padding: 5px 12px;
+  border: 1px solid var(--line-strong);
+  background: rgba(10, 14, 20, 0.6);
+  color: var(--text-dim);
+}
+.champ-body {
+  padding-top: 40px;
+  max-width: 860px;
+}
+.lore {
+  color: var(--text-dim);
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+.abilities {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.ability {
+  display: flex;
+  gap: 16px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  background: rgba(18, 26, 39, 0.4);
+}
+.ability img {
+  border-radius: 8px;
+  border: 1px solid var(--line-strong);
+  flex-shrink: 0;
+  height: 52px;
+}
+.ability b {
+  font-family: var(--font-display);
+}
+.ability b em {
+  color: var(--muted);
+  font-style: normal;
+  font-weight: 400;
+}
+.ability .key {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  color: #1a1206;
+  background: var(--gold);
+  font-size: 0.78rem;
+  margin-right: 4px;
+}
+.ability p {
+  color: var(--text-dim);
+  font-size: 0.92rem;
+  margin-top: 5px;
+}
+
+@media (max-width: 620px) {
+  .rank-cards {
+    grid-template-columns: 1fr;
+  }
+  .match-row {
+    grid-template-columns: 40px 1fr 1fr;
+    row-gap: 6px;
+  }
+  .match-row .mr-cs {
+    display: none;
+  }
+  .mr-res {
+    grid-column: 2 / 4;
+    text-align: left;
+  }
+}
