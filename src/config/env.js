@@ -58,6 +58,9 @@ const envSchema = z.object({
   // REST API / dashboard
   API_PORT: z.coerce.number().int().positive().default(3000),
   API_BASE_URL: z.string().url().default('http://localhost:3000'),
+  // Where to send the user after OAuth login (the future dashboard SPA). When
+  // set, it's also the CORS allow-origin. Optional.
+  DASHBOARD_URL: z.string().url().optional(),
   SESSION_SECRET: z
     .string()
     .min(16, 'SESSION_SECRET must be at least 16 characters'),

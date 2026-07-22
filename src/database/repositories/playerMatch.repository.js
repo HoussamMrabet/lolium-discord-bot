@@ -14,6 +14,15 @@ export class PlayerMatchRepository extends BaseRepository {
       .exec();
   }
 
+  /** Recent games across a set of summoners (for the dashboard match feed). */
+  recentForSummoners(summonerIds, limit = 20) {
+    return this.model
+      .find({ summonerId: { $in: summonerIds.map(toObjectId) } })
+      .sort({ gameEndAt: -1 })
+      .limit(limit)
+      .exec();
+  }
+
   recentByQueue(summonerId, queueId, limit = 10) {
     return this.model
       .find({ summonerId, queueId })
