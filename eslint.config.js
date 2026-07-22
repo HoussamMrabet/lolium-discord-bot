@@ -9,7 +9,8 @@ import prettier from 'eslint-config-prettier';
  */
 export default [
   {
-    ignores: ['node_modules/**', 'coverage/**', 'dist/**', 'logs/**'],
+    // `web/` is a separate Vite/React project with its own toolchain.
+    ignores: ['node_modules/**', 'coverage/**', 'dist/**', 'logs/**', 'web/**'],
   },
   js.configs.recommended,
   {
