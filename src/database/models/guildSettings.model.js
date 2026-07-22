@@ -61,6 +61,12 @@ const guildSettingsSchema = new Schema(
     // Current betting season; wallets/bets are keyed by this so a reset simply
     // starts a fresh season while archiving the old one.
     bettingSeasonId: { type: String, default: 'S1' },
+    // Dedupe markers for the last posted recap of each cadence (period -> key).
+    lastRecap: {
+      daily: { type: String, default: null },
+      weekly: { type: String, default: null },
+      monthly: { type: String, default: null },
+    },
     locale: { type: String, default: 'en-US' },
   },
   { timestamps: true, versionKey: false, minimize: false },

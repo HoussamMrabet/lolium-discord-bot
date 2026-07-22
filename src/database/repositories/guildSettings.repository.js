@@ -51,6 +51,16 @@ export class GuildSettingsRepository extends BaseRepository {
   setBettingSeason(guildId, seasonId) {
     return this.upsert({ guildId }, { $set: { bettingSeasonId: seasonId } });
   }
+
+  /** Records that a recap for a given cadence has been dispatched (dedupe). */
+  markRecap(guildId, period, key) {
+    return this.upsert({ guildId }, { $set: { [`lastRecap.${period}`]: key } });
+  }
+
+  /** Guilds that have a recaps channel configured. */
+  findWithRecaps() {
+    return this.find({ 'channels.recaps': { $ne: null } });
+  }
 }
 
 export default GuildSettingsRepository;

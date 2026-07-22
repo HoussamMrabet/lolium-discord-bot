@@ -28,3 +28,4 @@ export { createMatchProcessProcessor } from './matchProcess.js';
 export { createNotifyDispatchProcessor } from './notifyDispatch.js';
 export { createLeaderboardComputeProcessor } from './leaderboardCompute.js';
 export { createRoleSyncProcessor } from './roleSync.js';
+export { createRecapGenerateProcessor } from './recapGenerate.js';

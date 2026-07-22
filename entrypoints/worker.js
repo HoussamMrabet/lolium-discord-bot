@@ -24,6 +24,7 @@ import {
   createNotifyDispatchProcessor,
   createLeaderboardComputeProcessor,
   createRoleSyncProcessor,
+  createRecapGenerateProcessor,
 } from '../src/workers/index.js';
 
 /**
@@ -100,6 +101,21 @@ async function main() {
         createRoleSyncProcessor({
           repositories,
           roleSync: services.roleSync,
+          rest,
+          logger: log,
+        }),
+        { concurrency },
+      ),
+    );
+  }
+
+  if (all || type === QUEUE_NAMES.RECAP_GENERATE) {
+    workers.push(
+      startWorker(
+        QUEUE_NAMES.RECAP_GENERATE,
+        createRecapGenerateProcessor({
+          repositories,
+          recap: services.recap,
           rest,
           logger: log,
         }),

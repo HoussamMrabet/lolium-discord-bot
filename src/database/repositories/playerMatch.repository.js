@@ -96,6 +96,36 @@ export class PlayerMatchRepository extends BaseRepository {
       .exec();
   }
 
+  /**
+   * Single-game extremes over a window (best/worst KDA, biggest int, biggest
+   * carry) for recaps, in one query via $facet.
+   */
+  async recapExtremes(summonerIds, since) {
+    const match = {
+      summonerId: { $in: summonerIds.map(toObjectId) },
+      gameEndAt: { $gte: since },
+    };
+    const [row] = await this.model.aggregate([
+      { $match: match },
+      {
+        $facet: {
+          bestKda: [{ $sort: { kda: -1 } }, { $limit: 1 }],
+          worstKda: [{ $sort: { kda: 1 } }, { $limit: 1 }],
+          biggestInt: [{ $sort: { deaths: -1 } }, { $limit: 1 }],
+          biggestCarry: [{ $sort: { damageShare: -1 } }, { $limit: 1 }],
+          totals: [{ $group: { _id: null, games: { $sum: 1 } } }],
+        },
+      },
+    ]);
+    return {
+      bestKda: row?.bestKda?.[0] ?? null,
+      worstKda: row?.worstKda?.[0] ?? null,
+      biggestInt: row?.biggestInt?.[0] ?? null,
+      biggestCarry: row?.biggestCarry?.[0] ?? null,
+      games: row?.totals?.[0]?.games ?? 0,
+    };
+  }
+
   /** Role/position distribution for the stats embed. */
   roleDistribution(summonerId) {
     return this.model
