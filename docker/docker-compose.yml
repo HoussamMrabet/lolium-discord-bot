@@ -1,0 +1,91 @@
+# Run from the repo root:
+#   docker compose -f docker/docker-compose.yml up -d --build
+#
+# Secrets (DISCORD_TOKEN, RIOT_API_KEY, SESSION_SECRET, DISCORD_CLIENT_*) are
+# read from ../.env. The Mongo/Redis URLs are injected here to point at the
+# compose service names, so you can keep localhost defaults in .env for local dev.
+
+x-app-env: &app-env
+  NODE_ENV: production
+  MONGO_URI: mongodb://mongo:27017/discord_lol_bot
+  REDIS_URL: redis://redis:6379
+
+x-app: &app
+  build:
+    context: ..
+    dockerfile: docker/Dockerfile
+  image: discord-lol-bot:latest
+  env_file:
+    - ../.env
+  depends_on:
+    mongo:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+  restart: unless-stopped
+
+services:
+  mongo:
+    image: mongo:7
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ['CMD', 'mongosh', '--quiet', '--eval', "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ['redis-server', '--appendonly', 'yes']
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  bot:
+    <<: *app
+    command: ['node', 'entrypoints/bot.js']
+    environment: *app-env
+
+  scheduler:
+    <<: *app
+    command: ['node', 'entrypoints/scheduler.js']
+    environment: *app-env
+
+  worker:
+    <<: *app
+    command: ['node', 'entrypoints/worker.js']
+    environment:
+      <<: *app-env
+      WORKER_TYPE: all
+    # Scale horizontally: docker compose ... up --scale worker=3
+    deploy:
+      replicas: 1
+
+  api:
+    <<: *app
+    command: ['node', 'entrypoints/api.js']
+    environment: *app-env
+    ports:
+      - '${API_PORT:-3000}:3000'
+
+  # Single-process mode (bot + scheduler + workers + api). Opt-in:
+  #   docker compose -f docker/docker-compose.yml --profile mono up mono
+  mono:
+    <<: *app
+    command: ['node', 'entrypoints/mono.js']
+    environment:
+      <<: *app-env
+    ports:
+      - '${API_PORT:-3000}:3000'
+    profiles: ['mono']
+
+volumes:
+  mongo-data:
+  redis-data:
