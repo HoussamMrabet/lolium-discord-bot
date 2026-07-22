@@ -15,3 +15,19 @@ export const authLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+/** Public summoner lookup — hits Riot, so kept tight to protect the API budget. */
+export const lookupLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+/** Champion data — served from a CDN cache, so a looser limit is fine. */
+export const championLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+});

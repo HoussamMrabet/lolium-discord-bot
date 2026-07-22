@@ -8,8 +8,12 @@ import { notFoundHandler, errorHandler } from './middlewares/error.js';
 import { createDiscordOauth } from './auth/discordOauth.js';
 import { createAuthController } from './controllers/authController.js';
 import { createGuildsController } from './controllers/guildsController.js';
+import { createPublicController } from './controllers/publicController.js';
 import { authRouter } from './routes/auth.js';
 import { guildsRouter } from './routes/guilds.js';
+import { publicRouter } from './routes/public.js';
+import { createStaticDataService } from '../services/staticData.service.js';
+import { createLookupService } from '../services/lookup.service.js';
 
 /**
  * Builds the Express app for the dashboard REST API. Security posture:
@@ -18,7 +22,7 @@ import { guildsRouter } from './routes/guilds.js';
  * handler. Dependencies are injected so it can be built in tests without a live
  * Discord/Mongo/Redis.
  */
-export function createApp({ repositories, services, redis }) {
+export function createApp({ repositories, services, redis, riot }) {
   const app = express();
   app.set('trust proxy', 1);
   app.disable('x-powered-by');
@@ -65,6 +69,12 @@ export function createApp({ repositories, services, redis }) {
   const authController = createAuthController({ repositories, oauth, config: env });
   const guildsController = createGuildsController({ repositories, services });
 
+  // Public website endpoints (no auth): summoner lookup + champion browser.
+  const staticData = createStaticDataService({ redis });
+  const lookup = createLookupService({ riot, rank: services.rank, redis });
+  const publicController = createPublicController({ lookup, staticData });
+
+  app.use('/api/v1', publicRouter({ controller: publicController }));
   app.use('/api/v1/auth', authRouter({ controller: authController }));
   app.use('/api/v1/guilds', guildsRouter({ controller: guildsController, repositories }));
 

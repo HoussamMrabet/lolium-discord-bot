@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { TIERS } from '../../config/constants.js';
+import { SUPPORTED_PLATFORMS } from '../../config/regions.js';
 import { isValidTimezone } from '../../utils/time.js';
 
 const snowflake = z.string().regex(/^\d{17,20}$/, 'must be a Discord snowflake');
@@ -62,4 +63,15 @@ export const leaderboardQuery = z.object({
 
 export const matchesQuery = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(20),
+});
+
+// --- Public (website) endpoints ---
+
+export const lookupQuery = z.object({
+  riotId: z.string().min(3).max(50),
+  region: z.enum(SUPPORTED_PLATFORMS),
+});
+
+export const championParams = z.object({
+  id: z.string().regex(/^[A-Za-z0-9]+$/, 'invalid champion id').max(32),
 });

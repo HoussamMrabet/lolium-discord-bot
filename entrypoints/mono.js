@@ -85,7 +85,7 @@ async function main() {
 
   let server;
   if (env.DISCORD_CLIENT_SECRET && env.DISCORD_OAUTH_REDIRECT_URI) {
-    const app = createApp({ repositories, services, redis });
+    const app = createApp({ repositories, services, redis, riot });
     server = app.listen(env.API_PORT, () => log.info({ port: env.API_PORT }, 'api listening'));
   } else {
     log.warn('OAuth not configured — dashboard API disabled in mono mode');

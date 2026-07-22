@@ -28,7 +28,7 @@ async function main() {
   const redis = getRedis();
   const riot = createRiotService();
   const services = createServices({ riot, repositories, logger: log });
-  const app = createApp({ repositories, services, redis });
+  const app = createApp({ repositories, services, redis, riot });
 
   const server = app.listen(env.API_PORT, () =>
     log.info({ port: env.API_PORT }, 'api listening'),
