@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { inviteUrl } from '../lib/config.js';
+import { useAuth, discordAvatar } from '../lib/auth.jsx';
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
+  const auth = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -11,6 +13,8 @@ export default function Nav() {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  const avatar = discordAvatar(auth.user);
 
   return (
     <header className={`nav${scrolled ? ' scrolled' : ''}`}>
@@ -28,9 +32,16 @@ export default function Nav() {
         </nav>
 
         <div className="nav-cta">
-          <a className="btn btn-primary bevel" href={inviteUrl} target="_blank" rel="noreferrer">
-            Add to Discord
-          </a>
+          {auth.status === 'authed' ? (
+            <Link to="/dashboard" className="nav-user">
+              {avatar && <img src={avatar} alt="" width="28" height="28" />}
+              <span>{auth.user.username}</span>
+            </Link>
+          ) : (
+            <a className="btn btn-primary bevel" href={inviteUrl} target="_blank" rel="noreferrer">
+              Add to Discord
+            </a>
+          )}
         </div>
       </div>
     </header>

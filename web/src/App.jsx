@@ -7,6 +7,7 @@ import Search from './pages/Search.jsx';
 import Champions from './pages/Champions.jsx';
 import ChampionDetail from './pages/ChampionDetail.jsx';
 import Dashboard from './pages/Dashboard.jsx';
+import GuildSettings from './pages/GuildSettings.jsx';
 import NotFound from './pages/NotFound.jsx';
 
 export default function App() {
@@ -27,6 +28,7 @@ export default function App() {
           <Route path="/champions" element={<Champions />} />
           <Route path="/champions/:id" element={<ChampionDetail />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/:guildId" element={<GuildSettings />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

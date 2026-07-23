@@ -1,6 +1,7 @@
 import path from 'node:path';
 import fs from 'node:fs';
 import express from 'express';
+import { REST } from 'discord.js';
 import helmet from 'helmet';
 import session from 'express-session';
 import RedisStore from 'connect-redis';
@@ -39,7 +40,12 @@ export function createApp({ repositories, services, redis, riot }) {
           defaultSrc: ["'self'"],
           scriptSrc: ["'self'"],
           styleSrc: ["'self'", "'unsafe-inline'"],
-          imgSrc: ["'self'", 'data:', 'https://ddragon.leagueoflegends.com'],
+          imgSrc: [
+            "'self'",
+            'data:',
+            'https://ddragon.leagueoflegends.com',
+            'https://cdn.discordapp.com',
+          ],
           fontSrc: ["'self'", 'data:'],
           connectSrc: ["'self'"],
           objectSrc: ["'none'"],
@@ -96,7 +102,9 @@ export function createApp({ repositories, services, redis, riot }) {
     redirectUri: env.DISCORD_OAUTH_REDIRECT_URI,
   });
   const authController = createAuthController({ repositories, oauth, config: env });
-  const guildsController = createGuildsController({ repositories, services });
+  // Bot REST client — lets the dashboard list a guild's channels/roles.
+  const botRest = new REST({ version: '10' }).setToken(env.DISCORD_TOKEN);
+  const guildsController = createGuildsController({ repositories, services, botRest });
 
   // Public website endpoints (no auth): summoner lookup + champion browser.
   const staticData = createStaticDataService({ redis });

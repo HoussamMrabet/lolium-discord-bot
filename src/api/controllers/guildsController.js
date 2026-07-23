@@ -1,5 +1,9 @@
+import { Routes } from 'discord.js';
 import { NotFoundError } from '../../core/errors.js';
 import { buildGuildScope } from '../../services/guildScope.js';
+
+// Discord channel types we let admins pick for the bot to post in.
+const TEXT_CHANNEL_TYPES = new Set([0, 5]); // GUILD_TEXT, GUILD_ANNOUNCEMENT
 
 function serializeSettings(s) {
   return {
@@ -42,7 +46,38 @@ function buildSettingsUpdate(patch) {
   return update;
 }
 
-export function createGuildsController({ repositories, services }) {
+export function createGuildsController({ repositories, services, botRest }) {
+  // Live text channels for the settings dropdowns. Fails soft (empty list) if
+  // the bot can't read the guild rather than 500-ing the dashboard.
+  async function listChannels(req, res) {
+    let channels = [];
+    try {
+      const all = await botRest.get(Routes.guildChannels(req.guildId));
+      channels = all
+        .filter((c) => TEXT_CHANNEL_TYPES.has(c.type))
+        .map((c) => ({ id: c.id, name: c.name, position: c.position }))
+        .sort((a, b) => a.position - b.position);
+    } catch {
+      channels = [];
+    }
+    res.json({ channels });
+  }
+
+  // Assignable roles (excludes @everyone and bot-managed roles).
+  async function listRoles(req, res) {
+    let roles = [];
+    try {
+      const all = await botRest.get(Routes.guildRoles(req.guildId));
+      roles = all
+        .filter((r) => r.name !== '@everyone' && !r.managed)
+        .map((r) => ({ id: r.id, name: r.name, color: r.color, position: r.position }))
+        .sort((a, b) => b.position - a.position);
+    } catch {
+      roles = [];
+    }
+    res.json({ roles });
+  }
+
   async function listGuilds(req, res) {
     const ids = req.session.adminGuildIds ?? [];
     const guilds = ids.length
@@ -138,5 +173,7 @@ export function createGuildsController({ repositories, services }) {
     listMatches,
     getLeaderboards,
     getPlayerStats,
+    listChannels,
+    listRoles,
   };
 }

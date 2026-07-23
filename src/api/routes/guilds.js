@@ -29,6 +29,9 @@ export function guildsRouter({ controller, repositories }) {
     asyncHandler(controller.patchSettings),
   );
 
+  router.get('/:guildId/channels', gid, requireGuildAccess, asyncHandler(controller.listChannels));
+  router.get('/:guildId/roles', gid, requireGuildAccess, asyncHandler(controller.listRoles));
+
   router.get('/:guildId/players', gid, requireGuildAccess, asyncHandler(controller.listPlayers));
   router.delete(
     '/:guildId/players/:discordUserId/:summonerId',

@@ -324,3 +324,209 @@
     text-align: left;
   }
 }
+
+/* ============================ Dashboard ============================ */
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 6px;
+  border: 1px solid var(--line-strong);
+  background: rgba(23, 33, 47, 0.6);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  transition: border-color 0.15s ease;
+}
+.nav-user:hover {
+  border-color: var(--gold);
+}
+.nav-user img {
+  border-radius: 50%;
+}
+
+.guild-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+.guild-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 26px 18px;
+  border: 1px solid var(--line);
+  background: rgba(18, 26, 39, 0.5);
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.guild-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--gold-deep);
+  box-shadow: var(--shadow);
+}
+.guild-card img {
+  border-radius: 12px;
+}
+.guild-mono {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: linear-gradient(120deg, var(--gold-deep), var(--panel-2));
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--gold-bright);
+}
+.guild-card b {
+  font-family: var(--font-display);
+}
+.guild-card span {
+  font-size: 0.8rem;
+  color: var(--gold);
+}
+
+.settings-card {
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--panel), var(--bg-2));
+  padding: 26px 26px 28px;
+  margin-bottom: 18px;
+}
+.hint {
+  color: var(--muted);
+  font-size: 0.88rem;
+  margin-top: 4px;
+}
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.field-grid.roles {
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.field > span {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}
+.field .select,
+.field .input {
+  width: 100%;
+}
+
+.toggle-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 26px;
+}
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+.toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.toggle .track {
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--line-strong);
+  position: relative;
+  transition: background 0.2s ease;
+  flex-shrink: 0;
+}
+.toggle .track::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--text);
+  transition: transform 0.2s ease;
+}
+.toggle input:checked + .track {
+  background: linear-gradient(120deg, var(--gold), var(--gold-bright));
+}
+.toggle input:checked + .track::after {
+  transform: translateX(18px);
+  background: #1a1206;
+}
+.toggle input:focus-visible + .track {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.players-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.players-table th {
+  text-align: left;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+}
+.players-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.93rem;
+}
+.players-table .muted {
+  color: var(--muted);
+}
+.btn-remove {
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  color: #ffb3ba;
+  background: transparent;
+  border: 1px solid rgba(255, 92, 108, 0.35);
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.btn-remove:hover {
+  background: rgba(255, 92, 108, 0.12);
+}
+
+.save-bar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 16px 0;
+  margin-top: 8px;
+  background: linear-gradient(180deg, transparent, var(--bg) 40%);
+}
+.save-ok {
+  color: var(--win);
+  font-family: var(--font-display);
+}
+.save-err {
+  color: #ffb3ba;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 620px) {
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
+}
